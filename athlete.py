@@ -1,6 +1,5 @@
 from bs4 import BeautifulSoup
 import requests
-import json
 
 athlete_url = 'https://www.ufc.com/athlete/{}'
 
@@ -20,3 +19,4 @@ def athlete_image(name):
               'card_image_2': soup.find('div', {'class': 'c-mat__image-2'}).find('img')['src'],
               }
     return images
+

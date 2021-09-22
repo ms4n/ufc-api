@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from AthleteImage import athlete_image
-
+from athlete import athlete_image
+from events import fetch_event_name
 
 app = FastAPI()
 
@@ -10,6 +10,13 @@ def images(athlete_name: str):
     return athlete_image(athlete_name)
 
 
+@app.get("/upcoming-events")
+def upcoming_events():
+    result = fetch_event_name()
+
+    return result
+
+
 # if __name__ == '__main__':
 #     import uvicorn
-# uvicorn.run(app, host="127.0.0.1", port=8080)
+# uvicorn.run(app, host="127.0.0.1")

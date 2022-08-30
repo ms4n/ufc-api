@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 
 athlete_url = 'https://www.ufc.com/athlete/{}'
+gallery_url = 'https://www.ufc.com/gallery/photo-gallery-{}'
 
 
 def athlete_slug(name):
@@ -11,12 +12,24 @@ def athlete_slug(name):
 
 def athlete_image(name):
     slug = athlete_slug(name)
-    response = requests.get(athlete_url.format(slug))
-    soup = BeautifulSoup(response.text, 'html.parser')
-    images = {'hero_image': soup.find('div', {'class': 'c-hero--full'}).find('img')['src'],
-              'bio_image': soup.find('div', {'class': 'c-bio__image'}).find('img')['src'],
-              'card_image_1': soup.find('div', {'class': 'c-mat__image-1'}).find('img')['src'],
-              'card_image_2': soup.find('div', {'class': 'c-mat__image-2'}).find('img')['src'],
-              }
-    return images
+    athlete_response = requests.get(athlete_url.format(slug))
+    gallery_response = requests.get(gallery_url.format(slug))
 
+    athlete_soup = BeautifulSoup(athlete_response.text, 'html.parser')
+    gallery_soup = BeautifulSoup(gallery_response.text, 'html.parser')
+
+    images = {}
+
+    try:
+        bio_image = athlete_soup.find('div', {'class': 'hero-profile__image-wrap'}).find('img')['src']
+        images['bio_img'] = bio_image
+    except AttributeError:
+        images['bio_img'] = None
+
+    try:
+        main_image = gallery_soup.find('div', {'class': 'c-gallery-collapsed-item__content'}).find('source')['srcset']
+        images['main_img'] = main_image
+    except AttributeError:
+        images['main_img'] = None
+
+    return images

@@ -1,0 +1,6 @@
+# event_fighters = event_soup.find('td', {'class': 'l-page_align_left'})
+        # fighter_name_1 = event_fighters.find_all('a', {'class': 'b-link'})[0].text.strip()
+        # fighter_name_2 = event_fighters.find_all('a', {'class': 'b-link'})[1].text.strip()
+        #
+        # fighter_1_img = athlete_image(fighter_name_1)["bio_img"]
+        # fighter_2_img = athlete_image(fighter_name_2)["bio_img"]

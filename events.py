@@ -1,14 +1,15 @@
 from bs4 import BeautifulSoup
+from bs4 import SoupStrainer as strainer
 import requests
 import cchardet
 from athlete import athlete_bio_image
-from datetime import datetime
 
 upcoming_events_url = "http://www.ufcstats.com/statistics/events/upcoming"
+session = requests.Session()
 
 
 def fetch_event_names():
-    response = requests.get(upcoming_events_url)
+    response = session.get(upcoming_events_url)
     soup = BeautifulSoup(response.text, 'lxml')
     events = soup.find_all('tr', {'class': 'b-statistics__table-row'})[2:]
     upcoming_events = []
@@ -19,20 +20,15 @@ def fetch_event_names():
         event_date = event.find('span', {'class': 'b-statistics__date'}).text.strip()
         event_venue = event.find('td', {'class': 'b-statistics__table-col_style_big-top-padding'}).text.strip()
 
-        t1 = datetime.now()
+        event_response = session.get(event_url)
+        event_strainer = strainer('td', attrs={'class': 'b-fight-details__table-col l-page_align_left'})
+        event_soup = BeautifulSoup(event_response.text, 'lxml', parse_only=event_strainer)
 
-        event_response = requests.get(event_url)
-        event_soup = BeautifulSoup(event_response.text, 'lxml')
-
-        fighter_name_1 = event_soup.find_all('a', {'class': 'b-link'})[0].text.strip()
-        fighter_name_2 = event_soup.find_all('a', {'class': 'b-link'})[1].text.strip()
+        fighter_name_1 = event_soup.find_all('a')[0].text.strip()
+        fighter_name_2 = event_soup.find_all('a')[1].text.strip()
 
         fighter_1_img = athlete_bio_image(fighter_name_1)
         fighter_2_img = athlete_bio_image(fighter_name_2)
-
-        t2 = datetime.now()
-
-        print(t2-t1)
 
         events_dict = dict(zip(['name', 'url', 'date', 'venue', 'fighter_1', 'fighter_2'],
                                [event_name, event_url, event_date, event_venue, fighter_1_img, fighter_2_img]))
@@ -40,4 +36,3 @@ def fetch_event_names():
 
     return upcoming_events
 
-# fetch_event_names()

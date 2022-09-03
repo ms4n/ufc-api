@@ -12,8 +12,10 @@ def athlete_slug(name):
 
 
 def athlete_bio_image(name):
+
     slug = athlete_slug(name)
-    athlete_response = requests.get(athlete_url.format(slug))
+    session = requests.Session()
+    athlete_response = session.get(athlete_url.format(slug))
 
     bio_img_strainer = strainer('div', attrs={'class': 'hero-profile__image-wrap'})
     athlete_soup = soup(athlete_response.text, 'lxml', parse_only=bio_img_strainer)
@@ -25,4 +27,3 @@ def athlete_bio_image(name):
 
     return bio_image
 
-# print(athlete_bio_image('conor mcgregor'))

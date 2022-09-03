@@ -1,8 +1,9 @@
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup as soup
+from bs4 import SoupStrainer as strainer
 import requests
+import cchardet
 
 athlete_url = 'https://www.ufc.com/athlete/{}'
-gallery_url = 'https://www.ufc.com/gallery/photo-gallery-{}'
 
 
 def athlete_slug(name):
@@ -10,26 +11,18 @@ def athlete_slug(name):
     return slug
 
 
-def athlete_image(name):
+def athlete_bio_image(name):
     slug = athlete_slug(name)
     athlete_response = requests.get(athlete_url.format(slug))
-    gallery_response = requests.get(gallery_url.format(slug))
 
-    athlete_soup = BeautifulSoup(athlete_response.text, 'html.parser')
-    gallery_soup = BeautifulSoup(gallery_response.text, 'html.parser')
-
-    images = {}
+    bio_img_strainer = strainer('div', attrs={'class': 'hero-profile__image-wrap'})
+    athlete_soup = soup(athlete_response.text, 'lxml', parse_only=bio_img_strainer)
 
     try:
-        bio_image = athlete_soup.find('div', {'class': 'hero-profile__image-wrap'}).find('img')['src']
-        images['bio_img'] = bio_image
+        bio_image = athlete_soup.find('img')['src']
     except AttributeError:
-        images['bio_img'] = None
+        bio_image = None
 
-    try:
-        main_image = gallery_soup.find('div', {'class': 'c-gallery-collapsed-item__content'}).find('source')['srcset']
-        images['main_img'] = main_image
-    except AttributeError:
-        images['main_img'] = None
+    return bio_image
 
-    return images
+# print(athlete_bio_image('conor mcgregor'))

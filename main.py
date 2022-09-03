@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from athlete import athlete_image
+from athlete import athlete_bio_image
 from events import fetch_event_names
 
 app = FastAPI()
@@ -18,7 +18,7 @@ app.add_middleware(
 
 @app.get("/images/{athlete_name}")
 def images(athlete_name: str):
-    return athlete_image(athlete_name)
+    return athlete_bio_image(athlete_name)
 
 
 @app.get("/upcoming-events")
